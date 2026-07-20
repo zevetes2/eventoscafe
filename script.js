@@ -328,12 +328,12 @@ function showError(message) {
 // ============================================
 function sendDataJSONP(data, callback) {
     const callbackName = 'jsonpCallback_' + Date.now();
-
+    
     const script = document.createElement('script');
-
+    
     const params = new URLSearchParams();
     params.append('callback', callbackName);
-
+    
     for (let key in data) {
         if (key === 'asistentes') {
             params.append(key, JSON.stringify(data[key]));
@@ -341,35 +341,40 @@ function sendDataJSONP(data, callback) {
             params.append(key, data[key]);
         }
     }
-
+    
+    // Agregar timestamp para evitar cache
+    params.append('_', Date.now());
+    
     script.src = WEB_APP_URL + '?' + params.toString();
-
+    
+    // Manejar respuesta exitosa
     window[callbackName] = function(response) {
-        delete window[callbackName];
-        if (script.parentNode) {
-            script.parentNode.removeChild(script);
-        }
+        clearTimeout(timeoutId);
+        cleanup();
         callback(response);
     };
-
+    
+    // Manejar error de carga
     script.onerror = function() {
+        clearTimeout(timeoutId);
+        cleanup();
+        callback({ success: false, message: 'Error de conexión con el servidor' });
+    };
+    
+    // Cleanup function
+    function cleanup() {
         delete window[callbackName];
         if (script.parentNode) {
             script.parentNode.removeChild(script);
         }
-        callback({ success: false, message: 'Error de conexión con el servidor' });
-    };
-
-    setTimeout(function() {
-        if (window[callbackName]) {
-            delete window[callbackName];
-            if (script.parentNode) {
-                script.parentNode.removeChild(script);
-            }
-            callback({ success: false, message: 'Tiempo de espera agotado' });
-        }
+    }
+    
+    // Timeout de seguridad
+    const timeoutId = setTimeout(function() {
+        cleanup();
+        callback({ success: false, message: 'Tiempo de espera agotado' });
     }, 15000);
-
+    
     document.head.appendChild(script);
 }
 
