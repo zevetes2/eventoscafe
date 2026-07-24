@@ -720,80 +720,6 @@ body {
 }
 
 /* ============================================
-   MODAL
-   ============================================ */
-.modal {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-}
-
-.modal.hidden {
-    display: none;
-}
-
-.modal-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(4px);
-}
-
-.modal-content {
-    position: relative;
-    background: #111;
-    border: 1px solid rgba(249, 115, 22, 0.3);
-    border-radius: 20px;
-    padding: 40px;
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-    z-index: 10;
-}
-
-.modal-icon {
-    width: 64px;
-    height: 64px;
-    background: rgba(249, 115, 22, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    color: #f97316;
-}
-
-.modal-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
-
-.modal-text {
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 24px;
-}
-
-.modal-btn {
-    background: #ea580c;
-    color: #fff;
-    font-weight: 700;
-    padding: 12px 32px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.modal-btn:hover {
-    background: #f97316;
-}
-
-/* ============================================
    ANIMATIONS
    ============================================ */
 @keyframes fadeIn {
@@ -816,3 +742,16 @@ body {
 
 .splash-workshop-btn:nth-child(1) { animation-delay: 0.1s; }
 .splash-workshop-btn:nth-child(2) { animation-delay: 0.2s; }
+
+.price-info-text {
+    margin: 12px 0;
+    padding: 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+}
+
+.price-info-text p {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.8rem;
+    margin: 4px 0;
+}

@@ -1,5 +1,5 @@
 /* ============================================
-   COMUNIDAD VIVA - LANDING PAGE v2
+   COMUNIDAD CAFE - LANDING PAGE v2
    JavaScript con Splash Screen + JSONP
    ============================================
 
@@ -19,8 +19,14 @@ const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwHgXtoHOwNjPdnE9C4
 // ============================================
 let tallerSeleccionado = null; // 'adoracion' o 'ninos'
 let attendeeCounter = 1;
-const PRICE_PER_PERSON = 1500;
+let registroTemporal = null; // Guarda datos del registro para el comprobante
 
+// Precios según cantidad de asistentes
+function getPricePerPerson(count) {
+    if (count >= 10) return 1000;
+    if (count >= 5) return 1200;
+    return 1500;
+}
 // ============================================
 // SELECCIONAR TALLER (SPLASH SCREEN)
 // ============================================
@@ -256,8 +262,12 @@ function renumberAttendees() {
 // ============================================
 function updatePrice() {
     const count = document.querySelectorAll('.attendee-row').length;
+    const pricePerPerson = getPricePerPerson(count);
+    const total = count * pricePerPerson;
+    
     document.getElementById('attendee-count').textContent = count;
-    document.getElementById('total-price').textContent = `${count * PRICE_PER_PERSON} RD$`;
+    document.getElementById('price-per-person').textContent = `${pricePerPerson} RD$`;
+    document.getElementById('total-price').textContent = `${total} RD$`;
 }
 
 // ============================================
@@ -388,7 +398,7 @@ function generarMensajeWhatsApp(data, type) {
         const tallerTexto = data.taller === 'adoracion' ? 'Taller de Adoración' : 'Taller de Niños';
         const instrumentoTexto = data.instrumento ? `Instrumento: ${data.instrumento}` : '';
         
-        mensaje = `*NUEVO REGISTRO - COMUNIDAD VIVA 2026*\n\n`;
+        mensaje = `*NUEVO REGISTRO - CAFE 2026*\n\n`;
         mensaje += `*Tipo:* Individual\n`;
         mensaje += `*Taller:* ${tallerTexto}\n`;
         if (instrumentoTexto) mensaje += `*${instrumentoTexto}*\n`;
@@ -401,12 +411,16 @@ function generarMensajeWhatsApp(data, type) {
         mensaje += `Email: ${data.email}\n`;
         mensaje += `Ciudad: ${data.ciudad}, ${data.pais}\n`;
         mensaje += `\n`;
-        mensaje += `Por favor, indícame los datos para completar el pago. ¡Gracias!`;
+        mensaje += `*Inversión:* RD$1,500\n`;
+        mensaje += `\n`;
+        mensaje += `Adjunto mi comprobante de transferencia. Por favor validar mi inscripción. ¡Gracias!`;
         
     } else {
-        const cantidadAsistentes = data.asistentes ? data.asistentes.length : 0;
-        let listaAsistentes = '';
+        const count = data.asistentes ? data.asistentes.length : 0;
+        const pricePerPerson = getPricePerPerson(count);
+        const total = count * pricePerPerson;
         
+        let listaAsistentes = '';
         if (data.asistentes && Array.isArray(data.asistentes)) {
             data.asistentes.forEach((a, i) => {
                 const instrumentoTexto = a.instrumento ? ` (${a.instrumento})` : '';
@@ -414,9 +428,9 @@ function generarMensajeWhatsApp(data, type) {
             });
         }
         
-        mensaje = `*NUEVO REGISTRO GRUPAL - COMUNIDAD VIVA 2026*\n\n`;
+        mensaje = `*NUEVO REGISTRO GRUPAL - CAFE 2026*\n\n`;
         mensaje += `*Tipo:* Grupal\n`;
-        mensaje += `*Cantidad de asistentes:* ${cantidadAsistentes}\n`;
+        mensaje += `*Cantidad de asistentes:* ${count}\n`;
         mensaje += `\n`;
         mensaje += `*Datos del Líder:*\n`;
         mensaje += `Nombre: ${data.lider_nombre}\n`;
@@ -433,7 +447,9 @@ function generarMensajeWhatsApp(data, type) {
         mensaje += `*Lista de Asistentes:*\n`;
         mensaje += `${listaAsistentes}`;
         mensaje += `\n`;
-        mensaje += `Por favor, indícame los datos para completar el pago. ¡Gracias!`;
+        mensaje += `*Inversión:* ${pricePerPerson} RD$ p/p = ${total} RD$ total\n`;
+        mensaje += `\n`;
+        mensaje += `Adjunto mi comprobante de transferencia. Por favor validar mi inscripción. ¡Gracias!`;
     }
     
     return mensaje;
@@ -481,18 +497,14 @@ function handleSubmit(event, type) {
     sendDataJSONP(data, function(response) {
         showLoading(false);
 
-        if (response.success) {
-            // Generar mensaje de WhatsApp
+                if (response.success) {
+            // Generar mensaje de WhatsApp con datos del registro
             const mensajeWhatsApp = generarMensajeWhatsApp(data, type);
             const urlWhatsApp = 'https://wa.me/18494722853?text=' + encodeURIComponent(mensajeWhatsApp);
             
-            // Abrir WhatsApp en nueva pestaña
-            window.open(urlWhatsApp, '_blank');
-            
-            // Mostrar modal también
-            document.getElementById('success-modal').classList.remove('hidden');
+            // Resetear formulario
             form.reset();
-
+            
             if (type === 'grupal') {
                 const list = document.getElementById('attendees-list');
                 while (list.children.length > 1) {
@@ -501,35 +513,51 @@ function handleSubmit(event, type) {
                 attendeeCounter = 1;
                 updatePrice();
             }
-
-            // Restaurar campos de instrumento según taller
+            
             actualizarInstrumentoFields();
+            
+            // Redireccionar a WhatsApp (misma pestaña)
+            window.location.href = urlWhatsApp;
+            
+            return;
         } else {
             showError('Error: ' + (response.message || 'No se pudo guardar el registro'));
         }
     });
 }
 
-// ============================================
-// CERRAR MODAL
-// ============================================
-function closeModal() {
-    document.getElementById('success-modal').classList.add('hidden');
-}
 
 // ============================================
-// EVENT LISTENERS
+// MANEJAR SUBIDA DE ARCHIVO (preview)
 // ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('success-modal').addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal-backdrop')) {
-            closeModal();
+document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'comprobante-file') {
+        const file = e.target.files[0];
+        if (file) {
+            mostrarPreviewArchivo(file);
         }
-    });
-
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeModal();
-        }
-    });
+    }
 });
+
+function mostrarPreviewArchivo(file) {
+    const uploadArea = document.getElementById('file-upload-area');
+    const preview = document.getElementById('file-preview');
+    const content = uploadArea.querySelector('.file-upload-content');
+    const fileName = document.getElementById('file-name');
+    const previewImg = document.getElementById('file-preview-img');
+    
+    uploadArea.classList.add('has-file');
+    content.classList.add('hidden');
+    preview.classList.remove('hidden');
+    fileName.textContent = file.name;
+    
+    if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        previewImg.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
+    }
+}
