@@ -19,7 +19,7 @@ const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwHgXtoHOwNjPdnE9C4
 // ============================================
 let tallerSeleccionado = null; // 'adoracion' o 'ninos'
 let attendeeCounter = 1;
-const PRICE_PER_PERSON = 20;
+const PRICE_PER_PERSON = 1500;
 
 // ============================================
 // SELECCIONAR TALLER (SPLASH SCREEN)
@@ -257,7 +257,7 @@ function renumberAttendees() {
 function updatePrice() {
     const count = document.querySelectorAll('.attendee-row').length;
     document.getElementById('attendee-count').textContent = count;
-    document.getElementById('total-price').textContent = `$${count * PRICE_PER_PERSON} USD`;
+    document.getElementById('total-price').textContent = `${count * PRICE_PER_PERSON} RD$`;
 }
 
 // ============================================
