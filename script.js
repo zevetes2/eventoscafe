@@ -379,6 +379,70 @@ function sendDataJSONP(data, callback) {
 }
 
 // ============================================
+// GENERAR MENSAJE DE WHATSAPP
+// ============================================
+function generarMensajeWhatsApp(data, type) {
+    let mensaje = '';
+    
+    if (type === 'individual') {
+        const tallerTexto = data.taller === 'adoracion' ? 'Taller de Adoración' : 'Taller de Niños';
+        const instrumentoTexto = data.instrumento ? `Instrumento: ${data.instrumento}` : '';
+        
+        mensaje = `*NUEVO REGISTRO - COMUNIDAD VIVA 2026*\n\n`;
+        mensaje += `*Tipo:* Individual\n`;
+        mensaje += `*Taller:* ${tallerTexto}\n`;
+        if (instrumentoTexto) mensaje += `*${instrumentoTexto}*\n`;
+        mensaje += `\n`;
+        mensaje += `*Datos del registrante:*\n`;
+        mensaje += `Nombre: ${data.nombre} ${data.apellido}\n`;
+        mensaje += `Cédula: ${data.cedula}\n`;
+        mensaje += `Iglesia: ${data.iglesia}\n`;
+        mensaje += `Teléfono: ${data.telefono}\n`;
+        mensaje += `Email: ${data.email}\n`;
+        mensaje += `Ciudad: ${data.ciudad}, ${data.pais}\n`;
+        mensaje += `\n`;
+        mensaje += `Por favor, indícame los datos para completar el pago. ¡Gracias!`;
+        
+    } else {
+        const cantidadAsistentes = data.asistentes ? data.asistentes.length : 0;
+        let listaAsistentes = '';
+        
+        if (data.asistentes && Array.isArray(data.asistentes)) {
+            data.asistentes.forEach((a, i) => {
+                const instrumentoTexto = a.instrumento ? ` (${a.instrumento})` : '';
+                listaAsistentes += `${i + 1}. ${a.nombre} - Cédula: ${a.cedula}${instrumentoTexto}\n`;
+            });
+        }
+        
+        mensaje = `*NUEVO REGISTRO GRUPAL - COMUNIDAD VIVA 2026*\n\n`;
+        mensaje += `*Tipo:* Grupal\n`;
+        mensaje += `*Cantidad de asistentes:* ${cantidadAsistentes}\n`;
+        mensaje += `\n`;
+        mensaje += `*Datos del Líder:*\n`;
+        mensaje += `Nombre: ${data.lider_nombre}\n`;
+        mensaje += `Cédula: ${data.lider_cedula}\n`;
+        mensaje += `Cargo: ${data.lider_cargo}\n`;
+        mensaje += `Teléfono: ${data.lider_telefono}\n`;
+        mensaje += `Email: ${data.lider_email}\n`;
+        mensaje += `\n`;
+        mensaje += `*Datos del Grupo:*\n`;
+        mensaje += `Ministerio: ${data.ministerio}\n`;
+        mensaje += `Iglesia: ${data.iglesia}\n`;
+        mensaje += `Ciudad: ${data.ciudad}, ${data.pais}\n`;
+        mensaje += `\n`;
+        mensaje += `*Lista de Asistentes:*\n`;
+        mensaje += `${listaAsistentes}`;
+        mensaje += `\n`;
+        mensaje += `Por favor, indícame los datos para completar el pago. ¡Gracias!`;
+    }
+    
+    return mensaje;
+}
+
+
+
+
+// ============================================
 // MANEJAR ENVÍO DE FORMULARIO
 // ============================================
 function handleSubmit(event, type) {
@@ -418,6 +482,14 @@ function handleSubmit(event, type) {
         showLoading(false);
 
         if (response.success) {
+            // Generar mensaje de WhatsApp
+            const mensajeWhatsApp = generarMensajeWhatsApp(data, type);
+            const urlWhatsApp = 'https://wa.me/18494722853?text=' + encodeURIComponent(mensajeWhatsApp);
+            
+            // Abrir WhatsApp en nueva pestaña
+            window.open(urlWhatsApp, '_blank');
+            
+            // Mostrar modal también
             document.getElementById('success-modal').classList.remove('hidden');
             form.reset();
 
