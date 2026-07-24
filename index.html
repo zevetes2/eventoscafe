@@ -6,7 +6,6 @@
     <title>CAFE - Reserva la Fecha</title>
     <link rel="stylesheet" href="styles.css">
     <base target="_blank">
-<base target="_blank">
 </head>
 <body>
     <!-- ============================================
@@ -190,7 +189,29 @@
                         <!-- Payment Info -->
                         <div class="payment-info">
                             <p class="payment-title">Método de pago: Transferencia Bancaria</p>
-                            <p class="payment-desc">Al completar el registro serás redirigido a WhatsApp para recibir los datos bancarios y enviar tu comprobante.</p>
+                            <p class="payment-desc">Sube tu comprobante de transferencia aquí abajo para completar tu registro.</p>
+                        </div>
+
+                        <!-- Comprobante de pago -->
+                        <div class="form-section-block">
+                            <h4 class="form-section-title">Comprobante de pago</h4>
+                            <p class="comprobante-hint">Sube la foto o captura de tu transferencia (JPG, PNG o PDF).</p>
+                            <label class="file-upload-area">
+                                <input type="file" name="comprobante" accept="image/*,application/pdf" class="comprobante-input" required>
+                                <div class="file-upload-content">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                        <polyline points="17 8 12 3 7 8"/>
+                                        <line x1="12" y1="3" x2="12" y2="15"/>
+                                    </svg>
+                                    <p class="file-upload-title">Toca para subir tu comprobante</p>
+                                </div>
+                                <div class="file-preview hidden">
+                                    <img class="file-preview-img" alt="Vista previa del comprobante">
+                                    <span class="file-name"></span>
+                                    <span class="file-change-hint">Toca para cambiar</span>
+                                </div>
+                            </label>
                         </div>
 
                         <button type="submit" class="submit-btn">Completar Registro</button>
@@ -339,7 +360,29 @@
                         <!-- Payment Info -->
                         <div class="payment-info">
                             <p class="payment-title">Método de pago: Transferencia Bancaria</p>
-                            <p class="payment-desc">Al completar el registro serás redirigido a WhatsApp para recibir los datos bancarios y enviar tu comprobante.</p>
+                            <p class="payment-desc">Sube el comprobante de la transferencia del grupo aquí abajo para completar el registro.</p>
+                        </div>
+
+                        <!-- Comprobante de pago -->
+                        <div class="form-section-block">
+                            <h4 class="form-section-title">Comprobante de pago</h4>
+                            <p class="comprobante-hint">Sube la foto o captura de tu transferencia (JPG, PNG o PDF).</p>
+                            <label class="file-upload-area">
+                                <input type="file" name="comprobante" accept="image/*,application/pdf" class="comprobante-input" required>
+                                <div class="file-upload-content">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                        <polyline points="17 8 12 3 7 8"/>
+                                        <line x1="12" y1="3" x2="12" y2="15"/>
+                                    </svg>
+                                    <p class="file-upload-title">Toca para subir tu comprobante</p>
+                                </div>
+                                <div class="file-preview hidden">
+                                    <img class="file-preview-img" alt="Vista previa del comprobante">
+                                    <span class="file-name"></span>
+                                    <span class="file-change-hint">Toca para cambiar</span>
+                                </div>
+                            </label>
                         </div>
 
                         <button type="submit" class="submit-btn">Completar Registro Grupal</button>
