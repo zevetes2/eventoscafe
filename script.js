@@ -81,6 +81,9 @@ function volverAlSplash() {
     document.getElementById('instrumento-individual').classList.add('hidden');
     document.getElementById('attendee-instrumento-1').classList.add('hidden');
 
+    // Resetear vista previa del comprobante
+    resetComprobantePreviews();
+
     // Scroll al top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -334,58 +337,35 @@ function showError(message) {
 }
 
 // ============================================
-// ENVIAR DATOS VIA JSONP (Evita CORS)
+// ENVIAR DATOS VIA POST (permite enviar imágenes)
 // ============================================
-function sendDataJSONP(data, callback) {
-    const callbackName = 'jsonpCallback_' + Date.now();
-    
-    const script = document.createElement('script');
-    
-    const params = new URLSearchParams();
-    params.append('callback', callbackName);
-    
-    for (let key in data) {
-        if (key === 'asistentes') {
-            params.append(key, JSON.stringify(data[key]));
-        } else {
-            params.append(key, data[key]);
-        }
-    }
-    
-    // Agregar timestamp para evitar cache
-    params.append('_', Date.now());
-    
-    script.src = WEB_APP_URL + '?' + params.toString();
-    
-    // Manejar respuesta exitosa
-    window[callbackName] = function(response) {
-        clearTimeout(timeoutId);
-        cleanup();
-        callback(response);
-    };
-    
-    // Manejar error de carga
-    script.onerror = function() {
-        clearTimeout(timeoutId);
-        cleanup();
-        callback({ success: false, message: 'Error de conexión con el servidor' });
-    };
-    
-    // Cleanup function
-    function cleanup() {
-        delete window[callbackName];
-        if (script.parentNode) {
-            script.parentNode.removeChild(script);
-        }
-    }
-    
-    // Timeout de seguridad
-    const timeoutId = setTimeout(function() {
-        cleanup();
-        callback({ success: false, message: 'Tiempo de espera agotado' });
-    }, 15000);
-    
-    document.head.appendChild(script);
+// Nota: JSONP (GET) no sirve para el comprobante porque una imagen no cabe
+// en la URL. Usamos POST con Content-Type "text/plain" para que Google Apps
+// Script lo acepte sin bloqueo de CORS (evita la petición "preflight").
+function sendDataPOST(data, callback) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+    fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(data),
+        redirect: 'follow',
+        signal: controller.signal
+    })
+        .then(function(res) { return res.json(); })
+        .then(function(response) {
+            clearTimeout(timeoutId);
+            callback(response);
+        })
+        .catch(function(err) {
+            clearTimeout(timeoutId);
+            console.error('Error al enviar el registro:', err);
+            const message = err.name === 'AbortError'
+                ? 'Tiempo de espera agotado. Revisa tu conexión e inténtalo de nuevo.'
+                : 'Error de conexión con el servidor';
+            callback({ success: false, message: message });
+        });
 }
 
 // ============================================
@@ -413,8 +393,8 @@ function generarMensajeWhatsApp(data, type) {
         mensaje += `\n`;
         mensaje += `*Inversión:* RD$1,500\n`;
         mensaje += `\n`;
-        mensaje += `Adjunto mi comprobante de transferencia. Por favor validar mi inscripción. ¡Gracias!`;
-        
+        mensaje += `Ya subí mi comprobante de transferencia en el formulario. Por favor validar mi inscripción. ¡Gracias!`;
+
     } else {
         const count = data.asistentes ? data.asistentes.length : 0;
         const pricePerPerson = getPricePerPerson(count);
@@ -449,7 +429,7 @@ function generarMensajeWhatsApp(data, type) {
         mensaje += `\n`;
         mensaje += `*Inversión:* ${pricePerPerson} RD$ p/p = ${total} RD$ total\n`;
         mensaje += `\n`;
-        mensaje += `Adjunto mi comprobante de transferencia. Por favor validar mi inscripción. ¡Gracias!`;
+        mensaje += `Ya subí mi comprobante de transferencia en el formulario. Por favor validar mi inscripción. ¡Gracias!`;
     }
     
     return mensaje;
@@ -461,7 +441,7 @@ function generarMensajeWhatsApp(data, type) {
 // ============================================
 // MANEJAR ENVÍO DE FORMULARIO
 // ============================================
-function handleSubmit(event, type) {
+async function handleSubmit(event, type) {
     event.preventDefault();
 
     const form = event.target;
@@ -470,6 +450,9 @@ function handleSubmit(event, type) {
 
     data.tipo = type;
     data.taller = tallerSeleccionado;
+
+    // El objeto File no se puede serializar a JSON; lo procesamos aparte más abajo.
+    delete data.comprobante;
 
     // Para registro grupal, recolectar asistentes
     if (type === 'grupal') {
@@ -490,11 +473,27 @@ function handleSubmit(event, type) {
         });
     }
 
-    console.log('Enviando registro via JSONP:', data);
-
     showLoading(true);
 
-    sendDataJSONP(data, function(response) {
+    // Procesar comprobante: imagen (comprimida) o PDF -> base64
+    try {
+        const fileInput = form.querySelector('.comprobante-input');
+        if (fileInput && fileInput.files[0]) {
+            const comprobante = await leerComprobante(fileInput.files[0]);
+            data.comprobante_base64 = comprobante.base64;
+            data.comprobante_nombre = comprobante.nombre;
+            data.comprobante_tipo = comprobante.tipo;
+        }
+    } catch (err) {
+        console.error('Error al procesar el comprobante:', err);
+        showLoading(false);
+        showError('No se pudo procesar el comprobante. Intenta con otra imagen o archivo.');
+        return;
+    }
+
+    console.log('Enviando registro via POST');
+
+    sendDataPOST(data, function(response) {
         showLoading(false);
 
                 if (response.success) {
@@ -513,9 +512,10 @@ function handleSubmit(event, type) {
                 attendeeCounter = 1;
                 updatePrice();
             }
-            
+
             actualizarInstrumentoFields();
-            
+            resetComprobantePreviews();
+
             // Redireccionar a WhatsApp (misma pestaña)
             window.location.href = urlWhatsApp;
             
@@ -528,36 +528,137 @@ function handleSubmit(event, type) {
 
 
 // ============================================
-// MANEJAR SUBIDA DE ARCHIVO (preview)
+// COMPROBANTE: PREVIEW AL SELECCIONAR ARCHIVO
 // ============================================
 document.addEventListener('change', function(e) {
-    if (e.target && e.target.id === 'comprobante-file') {
-        const file = e.target.files[0];
-        if (file) {
-            mostrarPreviewArchivo(file);
-        }
+    if (e.target && e.target.classList.contains('comprobante-input')) {
+        mostrarPreviewComprobante(e.target);
     }
 });
 
-function mostrarPreviewArchivo(file) {
-    const uploadArea = document.getElementById('file-upload-area');
-    const preview = document.getElementById('file-preview');
-    const content = uploadArea.querySelector('.file-upload-content');
-    const fileName = document.getElementById('file-name');
-    const previewImg = document.getElementById('file-preview-img');
-    
-    uploadArea.classList.add('has-file');
+function mostrarPreviewComprobante(input) {
+    const area = input.closest('.file-upload-area');
+    if (!area) return;
+
+    const file = input.files[0];
+    const content = area.querySelector('.file-upload-content');
+    const preview = area.querySelector('.file-preview');
+    const previewImg = area.querySelector('.file-preview-img');
+    const fileName = area.querySelector('.file-name');
+
+    if (!file) {
+        area.classList.remove('has-file');
+        content.classList.remove('hidden');
+        preview.classList.add('hidden');
+        return;
+    }
+
+    area.classList.add('has-file');
     content.classList.add('hidden');
     preview.classList.remove('hidden');
     fileName.textContent = file.name;
-    
+
     if (file.type.startsWith('image/')) {
         const reader = new FileReader();
-        reader.onload = function(e) {
-            previewImg.src = e.target.result;
+        reader.onload = function(ev) {
+            previewImg.src = ev.target.result;
+            previewImg.classList.remove('hidden');
         };
         reader.readAsDataURL(file);
     } else {
-        previewImg.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="%23f97316" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>';
+        // PDF u otro: no mostramos imagen, solo el nombre del archivo
+        previewImg.classList.add('hidden');
+        previewImg.removeAttribute('src');
     }
+}
+
+// Restaura las zonas de subida a su estado inicial (tras enviar o volver)
+function resetComprobantePreviews() {
+    document.querySelectorAll('.file-upload-area').forEach(function(area) {
+        area.classList.remove('has-file');
+        const content = area.querySelector('.file-upload-content');
+        const preview = area.querySelector('.file-preview');
+        const previewImg = area.querySelector('.file-preview-img');
+        if (content) content.classList.remove('hidden');
+        if (preview) preview.classList.add('hidden');
+        if (previewImg) previewImg.removeAttribute('src');
+    });
+}
+
+// ============================================
+// COMPROBANTE: LEER Y CONVERTIR A BASE64
+// ============================================
+// Devuelve { base64, nombre, tipo }. Las imágenes se comprimen antes de
+// enviarlas para que el envío sea rápido y confiable; los PDF van tal cual.
+function leerComprobante(file) {
+    return new Promise(function(resolve, reject) {
+        function finalizar(blob) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                // Un dataURL viene como "data:<tipo>;base64,<datos>"; enviamos solo <datos>.
+                const base64 = String(reader.result).split(',')[1];
+                resolve({
+                    base64: base64,
+                    nombre: file.name,
+                    tipo: blob.type || file.type || 'application/octet-stream'
+                });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        }
+
+        if (file.type && file.type.indexOf('image/') === 0) {
+            // Si la compresión falla por cualquier motivo, enviamos el original.
+            comprimirImagen(file).then(finalizar).catch(function() { finalizar(file); });
+        } else {
+            finalizar(file);
+        }
+    });
+}
+
+// Redimensiona la imagen a máx. `maxLado` px y la exporta como JPEG.
+function comprimirImagen(file, maxLado, calidad) {
+    maxLado = maxLado || 1600;
+    calidad = calidad || 0.82;
+
+    return new Promise(function(resolve, reject) {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+
+        img.onload = function() {
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxLado || height > maxLado) {
+                if (width >= height) {
+                    height = Math.round(height * (maxLado / width));
+                    width = maxLado;
+                } else {
+                    width = Math.round(width * (maxLado / height));
+                    height = maxLado;
+                }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+            URL.revokeObjectURL(url);
+
+            canvas.toBlob(function(blob) {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject(new Error('No se pudo comprimir la imagen'));
+                }
+            }, 'image/jpeg', calidad);
+        };
+
+        img.onerror = function() {
+            URL.revokeObjectURL(url);
+            reject(new Error('No se pudo cargar la imagen'));
+        };
+
+        img.src = url;
+    });
 }
