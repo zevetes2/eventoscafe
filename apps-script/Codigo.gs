@@ -36,7 +36,7 @@ var PAGO = {
   beneficiario: 'Comunidad de Adoración Familia Eterna CAFE',
   banco: 'Banco Popular · Cuenta corriente',
   cuenta: '834253486',
-  rnc: '43034570',
+  rnc: '430345709',
   whatsapp: '849-472-2853'
 };
 
