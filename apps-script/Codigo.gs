@@ -37,7 +37,8 @@ var PAGO = {
   banco: 'Banco Popular · Cuenta corriente',
   cuenta: '834253486',
   rnc: '430345709',
-  whatsapp: '849-472-2853'
+  whatsapp: '849-472-2853',
+  replyTo: 'comunidadfamiliaeterna@gmail.com'
 };
 
 // ============================================================
@@ -287,7 +288,13 @@ function enviarEmailConfirmacion(data, tipo) {
       : 'Confirmación de Registro Grupal - CAFE 2026';
     var cuerpo = tipo === 'individual' ? generarEmailIndividual(data) : generarEmailGrupal(data);
 
-    MailApp.sendEmail({ to: destinatario, subject: asunto, htmlBody: cuerpo, name: 'Comunidad CAFE' });
+    MailApp.sendEmail({
+      to: destinatario,
+      subject: asunto,
+      htmlBody: cuerpo,
+      name: 'Comunidad CAFE',
+      replyTo: PAGO.replyTo
+    });
   } catch (error) {
     console.error('Error enviando email: ' + error);
   }
