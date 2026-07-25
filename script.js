@@ -12,7 +12,7 @@
 // ============================================
 // CONFIGURACIÓN - REEMPLAZA ESTA URL
 // ============================================
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwHgXtoHOwNjPdnE9C4Q_D1HJSvAw7kvF-mc8D3y4P_vPPh7YeuV1A6HZgF8wEFjDnJ4Q/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby_yEd54Yd2NXB4uH-A5JOifLOyWJ-V5utsr8Cs_vPk655fPvSYQhfIeeLMYRCfgrY0mQ/exec';
 
 // ============================================
 // VARIABLES GLOBALES
