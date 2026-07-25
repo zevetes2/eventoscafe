@@ -27,6 +27,60 @@ function getPricePerPerson(count) {
     if (count >= 5) return 1200;
     return 1500;
 }
+
+// ============================================
+// CTA: SCROLL A LOS TALLERES
+// ============================================
+function scrollToTalleres() {
+    const el = document.querySelector('.splash-workshops');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ============================================
+// CUENTA REGRESIVA AL EVENTO
+// ============================================
+const EVENTO_FECHA = new Date('2026-08-08T09:00:00-04:00'); // Sáb 8 Ago 2026, 9:00 AM (RD)
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+function actualizarCountdown() {
+    let diff = Math.floor((EVENTO_FECHA.getTime() - Date.now()) / 1000);
+    if (diff < 0) diff = 0;
+
+    const dias = Math.floor(diff / 86400);
+    const horas = Math.floor((diff % 86400) / 3600);
+    const min = Math.floor((diff % 3600) / 60);
+    const seg = diff % 60;
+
+    const set = function(id, val) {
+        const e = document.getElementById(id);
+        if (e) e.textContent = val;
+    };
+    set('cd-dias', dias);
+    set('cd-horas', pad2(horas));
+    set('cd-min', pad2(min));
+    set('cd-seg', pad2(seg));
+}
+
+// ============================================
+// BOTÓN STICKY (solo en el splash, al hacer scroll)
+// ============================================
+function actualizarStickyCta() {
+    const sticky = document.getElementById('sticky-cta');
+    const splash = document.getElementById('splash-screen');
+    if (!sticky || !splash) return;
+    const enSplash = !splash.classList.contains('hidden');
+    const scrolled = window.scrollY > 320;
+    sticky.classList.toggle('hidden', !(enSplash && scrolled));
+}
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarCountdown();
+    setInterval(actualizarCountdown, 1000);
+    actualizarStickyCta();
+    window.addEventListener('scroll', actualizarStickyCta, { passive: true });
+});
 // ============================================
 // SELECCIONAR TALLER (SPLASH SCREEN)
 // ============================================
@@ -52,6 +106,9 @@ function selectTaller(taller) {
 
     // Scroll al formulario
     formSection.scrollIntoView({ behavior: 'smooth' });
+
+    // Ocultar el botón sticky (ya no estamos en el splash)
+    actualizarStickyCta();
 }
 
 // ============================================
@@ -87,6 +144,9 @@ function volverAlSplash() {
 
     // Scroll al top
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Reevaluar el botón sticky (volvimos al splash)
+    actualizarStickyCta();
 }
 
 // ============================================

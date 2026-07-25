@@ -103,7 +103,7 @@ body {
     position: relative;
     z-index: 10;
     text-align: center;
-    padding: 0 24px;
+    padding: 48px 24px 96px;
     max-width: 700px;
     margin: 0 auto;
 }
@@ -1144,4 +1144,183 @@ body {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   CUENTA REGRESIVA
+   ============================================ */
+.countdown-wrap {
+    margin-bottom: 28px;
+}
+
+.countdown-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 12px;
+}
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 64px;
+    padding: 10px 6px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 12px;
+}
+
+.countdown-num {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: #fb923c;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.countdown-label {
+    margin-top: 4px;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.5);
+}
+
+/* ============================================
+   CTA PRINCIPAL (botón)
+   ============================================ */
+.splash-cta-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    color: #fff;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.splash-cta-box:hover {
+    transform: rotate(-2deg) scale(1.03);
+    box-shadow: 0 24px 48px rgba(234,88,12,0.45);
+}
+
+.splash-cta-title {
+    font-size: 2rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+}
+
+.splash-cta-sub {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.85);
+}
+
+@media (min-width: 768px) {
+    .splash-cta-title {
+        font-size: 3.25rem;
+    }
+}
+
+/* ============================================
+   TARJETAS: BADGE "CUPO LIMITADO" + CTA
+   ============================================ */
+.card-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    background: #dc2626;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.card-cta {
+    display: inline-block;
+    margin-top: 14px;
+    background: #ea580c;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+}
+
+.splash-workshop-btn:hover .card-cta {
+    background: #f97316;
+    transform: translateX(3px);
+}
+
+/* ============================================
+   CONTACTO (WhatsApp para dudas)
+   ============================================ */
+.splash-contacto {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.25s ease;
+}
+
+.splash-contacto:hover {
+    color: #fff;
+    border-color: #25d366;
+    background: rgba(37,211,102,0.1);
+}
+
+/* ============================================
+   BOTÓN FIJO (STICKY)
+   ============================================ */
+.sticky-cta {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    z-index: 900;
+    background: #ea580c;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 800;
+    padding: 15px 32px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(234,88,12,0.5);
+    animation: fadeIn 0.3s ease;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.sticky-cta:hover {
+    background: #f97316;
+    transform: translateX(-50%) translateY(-2px);
 }

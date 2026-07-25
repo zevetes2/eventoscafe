@@ -45,15 +45,29 @@
                 <p class="splash-date-sub">AGOSTO <span class="text-orange">2026</span></p>
             </div>
 
-            <div class="splash-cta-box">
-                <h1>Reserva la Fecha</h1>
+            <!-- Cuenta regresiva -->
+            <div class="countdown-wrap">
+                <p class="countdown-title">Faltan para el evento</p>
+                <div class="countdown" id="countdown">
+                    <div class="countdown-item"><span class="countdown-num" id="cd-dias">--</span><span class="countdown-label">Días</span></div>
+                    <div class="countdown-item"><span class="countdown-num" id="cd-horas">--</span><span class="countdown-label">Horas</span></div>
+                    <div class="countdown-item"><span class="countdown-num" id="cd-min">--</span><span class="countdown-label">Min</span></div>
+                    <div class="countdown-item"><span class="countdown-num" id="cd-seg">--</span><span class="countdown-label">Seg</span></div>
+                </div>
             </div>
+
+            <!-- CTA principal (botón que baja a los talleres) -->
+            <button type="button" class="splash-cta-box" onclick="scrollToTalleres()">
+                <span class="splash-cta-title">¡Regístrate Hoy!</span>
+                <span class="splash-cta-sub">Elige tu taller ↓</span>
+            </button>
 
             <p class="splash-question">¿A qué taller deseas asistir?</p>
 
             <div class="splash-workshops">
                 <button onclick="selectTaller('adoracion')" class="splash-workshop-btn splash-workshop-adoracion">
                     <div class="splash-workshop-image">
+                        <span class="card-badge">Cupo limitado</span>
                         <img src="taller-adoracion.jpeg" alt="Taller de Adoración y Alabanza - Mesa y Altar">
                     </div>
                     <div class="splash-workshop-info">
@@ -67,6 +81,7 @@
                             <span>Salón del 5to Piso</span>
                             <span>Acropolis Center</span>
                         </div>
+                        <span class="card-cta">Inscribirme →</span>
                     </div>
                     <div class="splash-workshop-arrow">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -77,6 +92,7 @@
 
                 <button onclick="selectTaller('ninos')" class="splash-workshop-btn splash-workshop-adoracion">
                     <div class="splash-workshop-image">
+                        <span class="card-badge">Cupo limitado</span>
                         <img src="taller-padres.jpeg" alt="Taller Mis Generaciones - Para padres y servidores del ministerio infantil">
                     </div>
                     <div class="splash-workshop-info">
@@ -90,6 +106,7 @@
                             <span>Salón del 5to Piso</span>
                             <span>Acropolis Center</span>
                         </div>
+                        <span class="card-cta">Inscribirme →</span>
                     </div>
                     <div class="splash-workshop-arrow">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -98,6 +115,13 @@
                     </div>
                 </button>
             </div>
+
+            <a class="splash-contacto" href="https://wa.me/18494722853?text=Hola%2C%20tengo%20una%20duda%20sobre%20el%20evento%20CAFE%202026" target="_blank" rel="noopener">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2m0 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24s8.24 3.7 8.24 8.24-3.7 8.23-8.23 8.23m4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43-.14 0-.31-.01-.47-.01-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28"/>
+                </svg>
+                ¿Tienes dudas? Escríbenos por WhatsApp
+            </a>
         </div>
     </section>
 
@@ -498,6 +522,11 @@
             </div>
         </div>
     </footer>
+
+    <!-- Botón fijo (sticky) — aparece al hacer scroll en el splash -->
+    <button type="button" id="sticky-cta" class="sticky-cta hidden" onclick="scrollToTalleres()">
+        Regístrate ahora →
+    </button>
 
     <!-- ============================================
          OVERLAY DE CARGA (pantalla completa)
