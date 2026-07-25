@@ -45,6 +45,7 @@ function selectTaller(taller) {
     document.getElementById('taller-badge').textContent = info.label;
     document.getElementById('taller-titulo').textContent = info.titulo;
     document.getElementById('taller-instructor').textContent = info.instructor;
+    document.getElementById('taller-detalle').textContent = info.detalle;
 
     // Mostrar/ocultar campo de instrumento según el taller
     actualizarInstrumentoFields();
@@ -93,14 +94,16 @@ function volverAlSplash() {
 // ============================================
 const TALLERES = {
     adoracion: {
-        label: 'Taller de Adoración',
-        titulo: 'Taller de Adoración',
-        instructor: 'Andrés Buffa - Ministerio Toma Tu Lugar'
+        label: 'Taller de Adoración y Alabanza',
+        titulo: 'Mesa y Altar',
+        instructor: 'Andrés Chapu Buffa · Músico y Productor Musical — Ministerio Toma Tu Lugar',
+        detalle: 'Sáb 8 Ago · 3:00 PM - 9:00 PM · Salón del 5to Piso, Acropolis Center'
     },
     ninos: {
-        label: 'Taller de Niños',
-        titulo: 'Taller de Niños',
-        instructor: 'Cintia Buffa - Ministerio Toma Tu Lugar (Líderes Infantiles)'
+        label: 'Taller "Mis Generaciones"',
+        titulo: 'Mis Generaciones',
+        instructor: 'Andrés y Cintia Buffa · Para padres y servidores del ministerio infantil',
+        detalle: 'Sáb 8 Ago · 9:00 AM - 1:00 PM · Salón del 5to Piso, Acropolis Center'
     }
 };
 
@@ -516,9 +519,9 @@ async function handleSubmit(event, type) {
             actualizarInstrumentoFields();
             resetComprobantePreviews();
 
-            // Redireccionar a WhatsApp (misma pestaña)
-            window.location.href = urlWhatsApp;
-            
+            // Mostrar pantalla de confirmación (WhatsApp queda como acción opcional)
+            mostrarConfirmacion(data, type, urlWhatsApp);
+
             return;
         } else {
             showError('Error: ' + (response.message || 'No se pudo guardar el registro'));
@@ -526,6 +529,64 @@ async function handleSubmit(event, type) {
     });
 }
 
+
+// ============================================
+// PANTALLA DE CONFIRMACIÓN
+// ============================================
+function mostrarConfirmacion(data, type, urlWhatsApp) {
+    document.getElementById('formulario-section').classList.add('hidden');
+
+    const nombre = type === 'grupal' ? (data.lider_nombre || '') : (data.nombre || '');
+    const tallerTxt = TALLERES[data.taller] ? TALLERES[data.taller].titulo : 'el taller';
+    const saludo = nombre ? ('Gracias, ' + nombre.trim() + '. ') : 'Gracias. ';
+    document.getElementById('confirmacion-text').textContent =
+        saludo + 'Tu inscripción al taller "' + tallerTxt + '" quedó registrada y tu comprobante fue recibido.';
+
+    document.getElementById('confirmacion-whatsapp').href = urlWhatsApp;
+
+    document.getElementById('confirmacion-section').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function registrarOtro() {
+    document.getElementById('confirmacion-section').classList.add('hidden');
+    volverAlSplash();
+}
+
+// ============================================
+// COPIAR AL PORTAPAPELES (datos bancarios)
+// ============================================
+function copiarDato(btn, texto) {
+    const original = btn.textContent;
+    const mostrarOk = function() {
+        btn.textContent = '¡Copiado!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+            btn.textContent = original;
+            btn.classList.remove('copied');
+        }, 1500);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto).then(mostrarOk).catch(function() {
+            copiarFallback(texto, mostrarOk);
+        });
+    } else {
+        copiarFallback(texto, mostrarOk);
+    }
+}
+
+function copiarFallback(texto, done) {
+    const ta = document.createElement('textarea');
+    ta.value = texto;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) { /* ignora */ }
+    document.body.removeChild(ta);
+    done();
+}
 
 // ============================================
 // COMPROBANTE: PREVIEW AL SELECCIONAR ARCHIVO

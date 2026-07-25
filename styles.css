@@ -908,3 +908,193 @@ body {
     bottom: 24px;
     right: 24px;
 }
+
+/* ============================================
+   DETALLE DEL TALLER (header del formulario)
+   ============================================ */
+.taller-detalle {
+    color: #fdba74;
+    font-size: 0.8rem;
+    margin-top: 6px;
+}
+
+/* ============================================
+   DATOS BANCARIOS
+   ============================================ */
+.bank-details {
+    margin: 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bank-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+}
+
+.bank-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.45);
+    font-weight: 600;
+}
+
+.bank-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    text-align: right;
+}
+
+.bank-mono {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+}
+
+.copy-btn {
+    flex-shrink: 0;
+    background: rgba(249,115,22,0.15);
+    color: #fb923c;
+    border: 1px solid rgba(249,115,22,0.35);
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+    background: rgba(249,115,22,0.25);
+}
+
+.copy-btn.copied {
+    background: rgba(34,197,94,0.2);
+    color: #4ade80;
+    border-color: rgba(34,197,94,0.4);
+}
+
+/* ============================================
+   PANTALLA DE CONFIRMACIÓN
+   ============================================ */
+.confirmacion-section {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    animation: fadeIn 0.5s ease;
+}
+
+.confirmacion-card {
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 48px 32px;
+}
+
+.confirmacion-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(34,197,94,0.15);
+    color: #4ade80;
+    animation: pulse 2.5s ease-in-out infinite;
+}
+
+.confirmacion-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.confirmacion-text {
+    color: rgba(255,255,255,0.85);
+    font-size: 1rem;
+    margin-bottom: 8px;
+}
+
+.confirmacion-sub {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.875rem;
+    margin-bottom: 28px;
+}
+
+.confirmacion-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.confirmacion-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    border: none;
+}
+
+.confirmacion-btn-wa {
+    background: #25d366;
+    color: #06251a;
+}
+
+.confirmacion-btn-wa:hover {
+    background: #1fb457;
+    transform: translateY(-1px);
+}
+
+.confirmacion-btn-ghost {
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.confirmacion-btn-ghost:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+}
+
+/* ============================================
+   ACCESIBILIDAD: FOCO VISIBLE
+   ============================================ */
+.form-input:focus-visible,
+.form-select:focus-visible,
+.submit-btn:focus-visible,
+.toggle-btn:focus-visible,
+.splash-workshop-btn:focus-visible,
+.btn-volver:focus-visible,
+.add-btn:focus-visible,
+.copy-btn:focus-visible,
+.confirmacion-btn:focus-visible,
+.file-upload-area:focus-within {
+    outline: 2px solid #fb923c;
+    outline-offset: 2px;
+}

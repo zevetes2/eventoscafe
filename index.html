@@ -3,9 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAFE - Reserva la Fecha</title>
+    <title>CAFE 2026 · Talleres de Adoración y Ministerio Infantil — Sábado 8 de Agosto</title>
+    <meta name="description" content="Reserva tu lugar en los talleres CAFE 2026: Adoración y Alabanza 'Mesa y Altar' con Andrés Chapu Buffa, y 'Mis Generaciones' para padres y servidores del ministerio infantil. Sábado 8 de agosto, Acropolis Center, Santo Domingo.">
+    <meta name="theme-color" content="#ea580c">
+
+    <!-- Open Graph (preview al compartir en WhatsApp / redes) -->
+    <!-- TODO: reemplaza TU-DOMINIO por el dominio real de Vercel para que la imagen cargue -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_DO">
+    <meta property="og:title" content="CAFE 2026 · Talleres de Adoración y Ministerio Infantil">
+    <meta property="og:description" content="Sábado 8 de agosto · Acropolis Center, Santo Domingo. Reserva tu lugar en los talleres 'Mesa y Altar' y 'Mis Generaciones'.">
+    <meta property="og:image" content="https://TU-DOMINIO.vercel.app/taller-adoracion.jpeg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CAFE 2026 · Talleres de Adoración y Ministerio Infantil">
+    <meta name="twitter:description" content="Sábado 8 de agosto · Acropolis Center, Santo Domingo. Reserva tu lugar.">
+    <meta name="twitter:image" content="https://TU-DOMINIO.vercel.app/taller-adoracion.jpeg">
+
+    <!-- Favicon (llama de Global Worship, en SVG embebido) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext y='20' font-size='20'%3E%F0%9F%94%A5%3C/text%3E%3C/svg%3E">
+
     <link rel="stylesheet" href="styles.css">
-    <base target="_blank">
 </head>
 <body>
     <!-- ============================================
@@ -41,10 +58,11 @@
                     </div>
                     <div class="splash-workshop-info">
                         <p class="splash-workshop-label">Taller de Adoración y Alabanza</p>
-                        <p class="splash-workshop-name">ANDRÉS CHAPU BUFFA</p>
-                        <p class="splash-workshop-detail">Músico y Productor Musical</p>
-                        <p class="splash-workshop-ministry">Ministerio Toma Tu Lugar</p>
+                        <p class="splash-workshop-name">MESA Y ALTAR</p>
+                        <p class="splash-workshop-detail">Andrés Chapu Buffa · Músico y Productor Musical</p>
+                        <p class="splash-workshop-ministry">Ministerio Toma Tu Lugar · Abierto para todo público</p>
                         <div class="splash-workshop-meta">
+                            <span>Sáb 8 Ago</span>
                             <span>3:00 PM - 9:00 PM</span>
                             <span>Salón del 5to Piso</span>
                             <span>Acropolis Center</span>
@@ -57,19 +75,21 @@
                     </div>
                 </button>
 
-                <button onclick="selectTaller('ninos')" class="splash-workshop-btn">
-                    <div class="splash-workshop-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-                        </svg>
+                <button onclick="selectTaller('ninos')" class="splash-workshop-btn splash-workshop-adoracion">
+                    <div class="splash-workshop-image">
+                        <img src="taller-padres.jpeg" alt="Taller Mis Generaciones - Para padres y servidores del ministerio infantil">
                     </div>
                     <div class="splash-workshop-info">
-                        <p class="splash-workshop-label">Taller de Niños</p>
-                        <p class="splash-workshop-name">CINTIA BUFFA</p>
-                        <p class="splash-workshop-ministry">Ministerio Toma Tu Lugar</p>
-                        <p class="splash-workshop-note">Para líderes infantiles</p>
+                        <p class="splash-workshop-label">Taller "Mis Generaciones"</p>
+                        <p class="splash-workshop-name">ANDRÉS Y CINTIA BUFFA</p>
+                        <p class="splash-workshop-detail">Ministerio Toma Tu Lugar</p>
+                        <p class="splash-workshop-note">Para padres y servidores del ministerio infantil</p>
+                        <div class="splash-workshop-meta">
+                            <span>Sáb 8 Ago</span>
+                            <span>9:00 AM - 1:00 PM</span>
+                            <span>Salón del 5to Piso</span>
+                            <span>Acropolis Center</span>
+                        </div>
                     </div>
                     <div class="splash-workshop-arrow">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -99,6 +119,7 @@
                     <span id="taller-badge" class="taller-badge">Taller</span>
                     <h2 id="taller-titulo" class="taller-titulo">Nombre del Taller</h2>
                     <p id="taller-instructor" class="taller-instructor">Instructor</p>
+                    <p id="taller-detalle" class="taller-detalle">Horario · Lugar</p>
                 </div>
             </div>
 
@@ -188,10 +209,34 @@
                             <p class="price-note">* Precio fijo para registro individual</p>
                         </div>
 
-                        <!-- Payment Info -->
+                        <!-- Datos de transferencia -->
                         <div class="payment-info">
-                            <p class="payment-title">Método de pago: Transferencia Bancaria</p>
-                            <p class="payment-desc">Sube tu comprobante de transferencia aquí abajo para completar tu registro.</p>
+                            <p class="payment-title">Paga por Transferencia Bancaria</p>
+                            <div class="bank-details">
+                                <div class="bank-row">
+                                    <span class="bank-label">Beneficiario</span>
+                                    <span class="bank-value">Comunidad de Adoración Familia Eterna CAFE</span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-label">Banco</span>
+                                    <span class="bank-value">Banco Popular · Cuenta corriente</span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-label">No. de cuenta</span>
+                                    <span class="bank-value">
+                                        <span class="bank-mono">834253486</span>
+                                        <button type="button" class="copy-btn" onclick="copiarDato(this, '834253486')">Copiar</button>
+                                    </span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-label">RNC</span>
+                                    <span class="bank-value">
+                                        <span class="bank-mono">43034570</span>
+                                        <button type="button" class="copy-btn" onclick="copiarDato(this, '43034570')">Copiar</button>
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="payment-desc">Realiza la transferencia y luego sube tu comprobante aquí abajo para completar tu registro.</p>
                         </div>
 
                         <!-- Comprobante de pago -->
@@ -359,10 +404,34 @@
                             <p class="price-note">* Precio se ajusta automáticamente según cantidad</p>
                         </div>
 
-                        <!-- Payment Info -->
+                        <!-- Datos de transferencia -->
                         <div class="payment-info">
-                            <p class="payment-title">Método de pago: Transferencia Bancaria</p>
-                            <p class="payment-desc">Sube el comprobante de la transferencia del grupo aquí abajo para completar el registro.</p>
+                            <p class="payment-title">Paga por Transferencia Bancaria</p>
+                            <div class="bank-details">
+                                <div class="bank-row">
+                                    <span class="bank-label">Beneficiario</span>
+                                    <span class="bank-value">Comunidad de Adoración Familia Eterna CAFE</span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-label">Banco</span>
+                                    <span class="bank-value">Banco Popular · Cuenta corriente</span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-label">No. de cuenta</span>
+                                    <span class="bank-value">
+                                        <span class="bank-mono">834253486</span>
+                                        <button type="button" class="copy-btn" onclick="copiarDato(this, '834253486')">Copiar</button>
+                                    </span>
+                                </div>
+                                <div class="bank-row">
+                                    <span class="bank-label">RNC</span>
+                                    <span class="bank-value">
+                                        <span class="bank-mono">43034570</span>
+                                        <button type="button" class="copy-btn" onclick="copiarDato(this, '43034570')">Copiar</button>
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="payment-desc">Realiza la transferencia del total del grupo y luego sube el comprobante aquí abajo para completar el registro.</p>
                         </div>
 
                         <!-- Comprobante de pago -->
@@ -390,6 +459,31 @@
                         <button type="submit" class="submit-btn">Completar Registro Grupal</button>
                     </form>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         CONFIRMACIÓN DE REGISTRO
+         ============================================ -->
+    <section id="confirmacion-section" class="confirmacion-section hidden">
+        <div class="confirmacion-card">
+            <div class="confirmacion-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 6L9 17l-5-5"/>
+                </svg>
+            </div>
+            <h2 class="confirmacion-title">¡Registro recibido!</h2>
+            <p class="confirmacion-text" id="confirmacion-text">Tu inscripción quedó registrada y tu comprobante fue recibido.</p>
+            <p class="confirmacion-sub">Validaremos tu pago y te confirmaremos pronto. Si tienes alguna duda, escríbenos por WhatsApp.</p>
+            <div class="confirmacion-actions">
+                <a id="confirmacion-whatsapp" class="confirmacion-btn confirmacion-btn-wa" href="#" target="_blank" rel="noopener">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2m0 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24s8.24 3.7 8.24 8.24-3.7 8.23-8.23 8.23m4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43-.14 0-.31-.01-.47-.01-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.22-.16-.47-.28"/>
+                    </svg>
+                    Escribir por WhatsApp
+                </a>
+                <button type="button" class="confirmacion-btn confirmacion-btn-ghost" onclick="registrarOtro()">Registrar otra inscripción</button>
             </div>
         </div>
     </section>
