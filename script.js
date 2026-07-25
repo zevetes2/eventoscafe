@@ -283,6 +283,10 @@ function showLoading(show) {
     const btnIndividual = document.querySelector('#individualForm .submit-btn');
     const btnGrupal = document.querySelector('#grupalForm .submit-btn');
 
+    // Overlay de pantalla completa (bloquea toda la interacción)
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) overlay.classList.toggle('hidden', !show);
+
     if (show) {
         if (btnIndividual) {
             btnIndividual.dataset.originalText = btnIndividual.textContent;

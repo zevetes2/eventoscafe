@@ -1098,3 +1098,50 @@ body {
     outline: 2px solid #fb923c;
     outline-offset: 2px;
 }
+
+/* ============================================
+   OVERLAY DE CARGA (pantalla completa)
+   ============================================ */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.25s ease;
+}
+
+.loading-box {
+    text-align: center;
+    max-width: 340px;
+}
+
+.loading-spinner {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    border: 5px solid rgba(249,115,22,0.2);
+    border-top-color: #f97316;
+    animation: spin 0.9s linear infinite;
+}
+
+.loading-text {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.loading-subtext {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
