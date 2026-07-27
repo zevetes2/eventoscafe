@@ -84,12 +84,60 @@ function doPost(e) {
   }
 }
 
-// GET: chequeo de salud + fallback JSONP (sin comprobante, no lo usa el sitio actual).
+// GET: stats de ocupación (JSONP) + fallback de registro + chequeo de salud.
 function doGet(e) {
+  if (e && e.parameter && e.parameter.action === 'stats') {
+    var stats = obtenerStats();
+    var cb = e.parameter.callback;
+    return cb
+      ? ContentService.createTextOutput(cb + '(' + JSON.stringify(stats) + ')').setMimeType(ContentService.MimeType.JAVASCRIPT)
+      : jsonResponse(stats);
+  }
   if (e && e.parameter && e.parameter.tipo) {
     return handleJsonp(e);
   }
   return jsonResponse({ success: true, message: 'CAFE 2026 backend activo' });
+}
+
+// ============================================================
+// STATS DE OCUPACIÓN (% por taller)
+// ============================================================
+var CUPO_POR_TALLER = 100; // capacidad de cada taller
+
+function obtenerStats() {
+  var cache = CacheService.getScriptCache();
+  var cached = cache.get('stats');
+  if (cached) return JSON.parse(cached);
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var adoracion = 0, ninos = 0;
+
+  // Suma inscritos por taller a partir del texto de la columna "Taller".
+  // "Mesa y Altar" está en Adoración y en Ambos; "Generaciones" en Niños y en Ambos.
+  function contar(nombreHoja, colTaller) {
+    var sh = ss.getSheetByName(nombreHoja);
+    if (!sh) return;
+    var last = sh.getLastRow();
+    if (last < 2) return;
+    var vals = sh.getRange(2, colTaller, last - 1, 1).getValues();
+    vals.forEach(function(r) {
+      var t = String(r[0]);
+      if (t.indexOf('Mesa y Altar') !== -1) adoracion++;
+      if (t.indexOf('Generaciones') !== -1) ninos++;
+    });
+  }
+
+  contar(CONFIG.HOJA_INDIVIDUAL, 10);  // col J = Taller
+  contar(CONFIG.HOJA_ASISTENTES, 6);   // col F = Taller
+
+  var pct = function(n) { return Math.min(100, Math.round((n / CUPO_POR_TALLER) * 100)); };
+  var result = {
+    adoracion: { pct: pct(adoracion) },
+    ninos: { pct: pct(ninos) }
+  };
+
+  cache.put('stats', JSON.stringify(result), 45); // cache 45s para no leer la hoja en cada visita
+  return result;
 }
 
 // ============================================================

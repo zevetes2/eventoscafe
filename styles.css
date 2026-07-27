@@ -1382,3 +1382,52 @@ body {
     font-size: 0.8rem;
     color: rgba(255,255,255,0.6);
 }
+
+/* ============================================
+   BARRA DE OCUPACIÓN (% por taller)
+   ============================================ */
+.ocupacion {
+    margin-top: 14px;
+}
+
+.ocupacion-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.ocupacion-lbl {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ocupacion-pct {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #fb923c;
+    font-variant-numeric: tabular-nums;
+}
+
+.ocupacion-bar {
+    height: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.ocupacion-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #f97316, #ea580c);
+    transition: width 0.9s ease;
+}
+
+/* Casi lleno: la barra se pone roja para más urgencia */
+.ocupacion-fill.casi-lleno {
+    background: linear-gradient(90deg, #f59e0b, #dc2626);
+}
