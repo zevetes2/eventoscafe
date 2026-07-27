@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Panel de Ocupación · CAFE 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .panel-wrap {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+        .panel-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+        .panel-sub {
+            color: #f87171;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 32px;
+        }
+        .panel-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 18px;
+        }
+        .panel-card h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .panel-card h2 small {
+            color: rgba(255,255,255,0.5);
+            font-weight: 500;
+        }
+        .panel-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin: 14px 0 10px;
+        }
+        .panel-num {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fb923c;
+            font-variant-numeric: tabular-nums;
+        }
+        .panel-cap {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.45);
+            font-weight: 600;
+        }
+        .panel-pct {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+        .panel-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 28px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .panel-updated {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+        }
+        .panel-btn {
+            background: #ea580c;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 22px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s ease;
+        }
+        .panel-btn:hover { background: #f97316; }
+        .panel-error {
+            color: #f87171;
+            font-size: 0.9rem;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="panel-wrap">
+        <h1 class="panel-title">Panel de Ocupación · CAFE 2026</h1>
+        <p class="panel-sub">🔒 Vista interna — no compartas este enlace</p>
+
+        <div class="panel-card">
+            <h2>Mesa y Altar <small>· Taller de Adoración</small></h2>
+            <div class="panel-row">
+                <span><span class="panel-num" id="n-adoracion">–</span> <span class="panel-cap">/ <span id="cap-adoracion">100</span> inscritos</span></span>
+                <span class="panel-pct" id="pct-adoracion">–%</span>
+            </div>
+            <div class="ocupacion-bar"><div class="ocupacion-fill" id="fill-adoracion"></div></div>
+        </div>
+
+        <div class="panel-card">
+            <h2>Mis Generaciones <small>· Taller para padres</small></h2>
+            <div class="panel-row">
+                <span><span class="panel-num" id="n-ninos">–</span> <span class="panel-cap">/ <span id="cap-ninos">100</span> inscritos</span></span>
+                <span class="panel-pct" id="pct-ninos">–%</span>
+            </div>
+            <div class="ocupacion-bar"><div class="ocupacion-fill" id="fill-ninos"></div></div>
+        </div>
+
+        <p class="panel-error hidden" id="panel-error">No se pudieron cargar los datos. Reintentando…</p>
+
+        <div class="panel-foot">
+            <span class="panel-updated">Actualizado: <span id="updated">cargando…</span></span>
+            <button type="button" class="panel-btn" onclick="cargar()">Actualizar ahora</button>
+        </div>
+    </div>
+
+    <script>
+        var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby_yEd54Yd2NXB4uH-A5JOifLOyWJ-V5utsr8Cs_vPk655fPvSYQhfIeeLMYRCfgrY0mQ/exec';
+
+        function setTaller(taller, info, cupo) {
+            if (!info) return;
+            var n = document.getElementById('n-' + taller);
+            var p = document.getElementById('pct-' + taller);
+            var f = document.getElementById('fill-' + taller);
+            var cap = document.getElementById('cap-' + taller);
+            if (n) n.textContent = (info.n != null ? info.n : info.pct);
+            if (p) p.textContent = info.pct + '%';
+            if (cap && cupo) cap.textContent = cupo;
+            if (f) {
+                f.style.width = info.pct + '%';
+                f.classList.toggle('casi-lleno', info.pct >= 80);
+            }
+        }
+
+        function aplicarStats(data) {
+            if (!data) return;
+            document.getElementById('panel-error').classList.add('hidden');
+            setTaller('adoracion', data.adoracion, data.cupo);
+            setTaller('ninos', data.ninos, data.cupo);
+            var d = new Date();
+            document.getElementById('updated').textContent = d.toLocaleTimeString();
+        }
+
+        // JSONP: reutiliza el endpoint ?action=stats sin problemas de CORS
+        function cargar() {
+            var cb = 'panelCb_' + Date.now();
+            var s = document.createElement('script');
+            var fallo = setTimeout(function() {
+                document.getElementById('panel-error').classList.remove('hidden');
+                limpiar();
+            }, 10000);
+            function limpiar() {
+                clearTimeout(fallo);
+                try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+                if (s.parentNode) s.parentNode.removeChild(s);
+            }
+            window[cb] = function(data) { aplicarStats(data); limpiar(); };
+            s.onerror = function() {
+                document.getElementById('panel-error').classList.remove('hidden');
+                limpiar();
+            };
+            s.src = WEB_APP_URL + '?action=stats&callback=' + cb + '&_=' + Date.now();
+            document.body.appendChild(s);
+        }
+
+        cargar();
+        setInterval(cargar, 30000); // refresca cada 30s
+    </script>
+</body>
+</html>

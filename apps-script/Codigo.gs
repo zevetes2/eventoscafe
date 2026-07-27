@@ -132,8 +132,9 @@ function obtenerStats() {
 
   var pct = function(n) { return Math.min(100, Math.round((n / CUPO_POR_TALLER) * 100)); };
   var result = {
-    adoracion: { pct: pct(adoracion) },
-    ninos: { pct: pct(ninos) }
+    cupo: CUPO_POR_TALLER,
+    adoracion: { pct: pct(adoracion), n: adoracion },
+    ninos: { pct: pct(ninos), n: ninos }
   };
 
   cache.put('stats', JSON.stringify(result), 45); // cache 45s para no leer la hoja en cada visita

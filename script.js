@@ -74,50 +74,12 @@ function actualizarStickyCta() {
     sticky.classList.toggle('hidden', !(enSplash && scrolled));
 }
 
-// ============================================
-// OCUPACIÓN (% por taller, leído del backend)
-// ============================================
-function setOcupacion(taller, pct) {
-    if (typeof pct !== 'number') return;
-    const fill = document.getElementById('fill-' + taller);
-    const label = document.getElementById('pct-' + taller);
-    if (label) label.textContent = pct + '%';
-    if (fill) {
-        fill.style.width = pct + '%';
-        fill.classList.toggle('casi-lleno', pct >= 80);
-        const cont = fill.closest('.ocupacion');
-        if (cont) cont.classList.remove('hidden');
-    }
-}
-
-function aplicarStats(data) {
-    if (!data) return;
-    if (data.adoracion) setOcupacion('adoracion', data.adoracion.pct);
-    if (data.ninos) setOcupacion('ninos', data.ninos.pct);
-}
-
-// JSONP: pide el % de ocupación sin problemas de CORS
-function cargarStats() {
-    const cb = 'statsCb_' + Date.now();
-    const s = document.createElement('script');
-    const limpiar = function() {
-        try { delete window[cb]; } catch (e) { window[cb] = undefined; }
-        if (s.parentNode) s.parentNode.removeChild(s);
-    };
-    window[cb] = function(data) { aplicarStats(data); limpiar(); };
-    s.onerror = limpiar;
-    s.src = WEB_APP_URL + '?action=stats&callback=' + cb + '&_=' + Date.now();
-    document.body.appendChild(s);
-}
-
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
     actualizarCountdown();
     setInterval(actualizarCountdown, 1000);
     actualizarStickyCta();
     window.addEventListener('scroll', actualizarStickyCta, { passive: true });
-    cargarStats();
-    setInterval(cargarStats, 60000); // refrescar cada minuto
 });
 // ============================================
 // SELECCIONAR TALLER (SPLASH SCREEN)
