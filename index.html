@@ -114,6 +114,22 @@
                         </svg>
                     </div>
                 </button>
+
+                <!-- COMBO: los dos talleres (solo individual) -->
+                <button onclick="selectTaller('ambos')" class="splash-workshop-btn splash-workshop-combo">
+                    <span class="combo-ribbon">★ Mejor valor · Ahorra RD$500</span>
+                    <div class="splash-workshop-info">
+                        <p class="splash-workshop-label">Los dos talleres</p>
+                        <p class="splash-workshop-name">MESA Y ALTAR + MIS GENERACIONES</p>
+                        <p class="splash-workshop-detail">Asiste a los dos el mismo sábado — mañana y tarde</p>
+                        <div class="combo-price">
+                            <span class="combo-price-now">RD$2,500</span>
+                            <span class="combo-price-old">RD$3,000</span>
+                            <span class="combo-price-tag">por persona</span>
+                        </div>
+                        <span class="card-cta">Inscribirme a los dos →</span>
+                    </div>
+                </button>
             </div>
 
             <a class="splash-contacto" href="https://wa.me/18494722853?text=Hola%2C%20tengo%20una%20duda%20sobre%20el%20evento%20CAFE%202026" target="_blank" rel="noopener">
@@ -228,9 +244,9 @@
                         <div class="price-box">
                             <div class="price-row">
                                 <span class="price-label">Inversión:</span>
-                                <span class="price-value">RD$1,500</span>
+                                <span class="price-value" id="individual-price">RD$1,500</span>
                             </div>
-                            <p class="price-note">* Precio fijo para registro individual</p>
+                            <p class="price-note" id="individual-price-note">* Precio fijo para registro individual</p>
                         </div>
 
                         <!-- Datos de transferencia -->

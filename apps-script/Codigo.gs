@@ -163,7 +163,7 @@ function guardarRegistroIndividual(data, comprobanteUrl) {
     textoTaller(data.taller),
     data.instrumento || '',
     esSi(data.contacto_futuro),
-    'RD$1,500',
+    precioIndividualTexto(data.taller),
     comprobanteUrl,
     'PENDIENTE'
   ]);
@@ -331,7 +331,7 @@ function generarEmailIndividual(data) {
           '<p><strong>Iglesia:</strong> ' + (data.iglesia || '') + '</p>' +
           '<p><strong>Ciudad:</strong> ' + (data.ciudad || '') + ', ' + (data.pais || '') + '</p>' +
         '</div>' +
-        bloquePagoHtml('Monto: RD$1,500') +
+        bloquePagoHtml('Monto: ' + precioIndividualTexto(data.taller)) +
         '<p style="color:#666;font-size:14px;">¡Nos vemos el 8 de agosto!</p>' +
       '</div>' +
       '<div style="background:#1a1a1a;padding:20px;text-align:center;">' +
@@ -395,7 +395,13 @@ function precioPorPersona(count) {
 function textoTaller(taller) {
   if (taller === 'adoracion') return 'Taller de Adoración y Alabanza (Mesa y Altar)';
   if (taller === 'ninos') return 'Taller "Mis Generaciones" (para padres y servidores)';
+  if (taller === 'ambos') return 'Ambos talleres (Mesa y Altar + Mis Generaciones)';
   return taller || '';
+}
+
+// Precio del registro individual según el taller (2500 si son los dos)
+function precioIndividualTexto(taller) {
+  return taller === 'ambos' ? 'RD$2,500' : 'RD$1,500';
 }
 
 function esSi(valor) {

@@ -1324,3 +1324,61 @@ body {
     background: #f97316;
     transform: translateX(-50%) translateY(-2px);
 }
+
+/* ============================================
+   TARJETA COMBO (los dos talleres)
+   ============================================ */
+.splash-workshop-combo {
+    position: relative;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(249,115,22,0.18), rgba(234,88,12,0.08));
+    border: 2px solid rgba(249,115,22,0.6);
+}
+
+.splash-workshop-combo:hover {
+    border-color: #f97316;
+    background: linear-gradient(135deg, rgba(249,115,22,0.28), rgba(234,88,12,0.12));
+}
+
+.combo-ribbon {
+    display: block;
+    background: #ea580c;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+    padding: 8px 12px;
+}
+
+.splash-workshop-combo .splash-workshop-info {
+    padding: 20px 24px 24px;
+}
+
+.combo-price {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.combo-price-now {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #fb923c;
+}
+
+.combo-price-old {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.45);
+    text-decoration: line-through;
+}
+
+.combo-price-tag {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.6);
+}

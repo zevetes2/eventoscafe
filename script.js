@@ -104,11 +104,32 @@ function selectTaller(taller) {
     // Mostrar/ocultar campo de instrumento según el taller
     actualizarInstrumentoFields();
 
+    // "Ambos talleres" solo aplica para registro individual: ocultamos el toggle
+    const esAmbos = taller === 'ambos';
+    document.querySelector('.toggle-container').classList.toggle('hidden', esAmbos);
+    if (esAmbos) showFormTipo('individual');
+
+    // Actualizar el precio del formulario individual según el taller
+    actualizarPrecioIndividual();
+
     // Scroll al formulario
     formSection.scrollIntoView({ behavior: 'smooth' });
 
     // Ocultar el botón sticky (ya no estamos en el splash)
     actualizarStickyCta();
+}
+
+// Actualiza el precio mostrado en el formulario individual
+function actualizarPrecioIndividual() {
+    const precio = precioIndividualDe(tallerSeleccionado);
+    const valor = document.getElementById('individual-price');
+    const nota = document.getElementById('individual-price-note');
+    if (valor) valor.textContent = 'RD$' + precio.toLocaleString('en-US');
+    if (nota) {
+        nota.textContent = tallerSeleccionado === 'ambos'
+            ? '* Incluye los dos talleres — ahorras RD$500'
+            : '* Precio fijo para registro individual';
+    }
 }
 
 // ============================================
@@ -164,8 +185,27 @@ const TALLERES = {
         titulo: 'Mis Generaciones',
         instructor: 'Andrés y Cintia Buffa · Para padres y servidores del ministerio infantil',
         detalle: 'Sáb 8 Ago · 9:00 AM - 1:00 PM · Salón del 5to Piso, Acropolis Center'
+    },
+    ambos: {
+        label: 'Los dos talleres',
+        titulo: 'Mesa y Altar + Mis Generaciones',
+        instructor: 'Andrés Chapu Buffa y Cintia Buffa · Ministerio Toma Tu Lugar',
+        detalle: 'Sáb 8 Ago · Mañana (9:00 AM) y Tarde (3:00 PM) · Salón del 5to Piso, Acropolis Center'
     }
 };
+
+// Precio del registro individual según el taller
+function precioIndividualDe(taller) {
+    return taller === 'ambos' ? 2500 : 1500;
+}
+
+// Texto largo del taller para mensajes
+function tallerTextoLargo(taller) {
+    if (taller === 'adoracion') return 'Taller de Adoración y Alabanza (Mesa y Altar)';
+    if (taller === 'ninos') return 'Taller Mis Generaciones';
+    if (taller === 'ambos') return 'Ambos talleres (Mesa y Altar + Mis Generaciones)';
+    return taller || '';
+}
 
 // ============================================
 // ACTUALIZAR CAMPOS DE INSTRUMENTO
@@ -175,7 +215,8 @@ function actualizarInstrumentoFields() {
     const instrumentoSelect = instrumentoIndividual.querySelector('select');
 
     // Mostrar/ocultar instrumento en formulario individual
-    if (tallerSeleccionado === 'adoracion') {
+    // (aplica a Adoración y a "Ambos", que incluye Adoración)
+    if (tallerSeleccionado === 'adoracion' || tallerSeleccionado === 'ambos') {
         instrumentoIndividual.classList.remove('hidden');
         instrumentoSelect.setAttribute('required', 'required');
     } else {
@@ -442,9 +483,10 @@ function generarMensajeWhatsApp(data, type) {
     let mensaje = '';
     
     if (type === 'individual') {
-        const tallerTexto = data.taller === 'adoracion' ? 'Taller de Adoración' : 'Taller de Niños';
+        const tallerTexto = tallerTextoLargo(data.taller);
         const instrumentoTexto = data.instrumento ? `Instrumento: ${data.instrumento}` : '';
-        
+        const inversion = precioIndividualDe(data.taller);
+
         mensaje = `*NUEVO REGISTRO - CAFE 2026*\n\n`;
         mensaje += `*Tipo:* Individual\n`;
         mensaje += `*Taller:* ${tallerTexto}\n`;
@@ -458,7 +500,7 @@ function generarMensajeWhatsApp(data, type) {
         mensaje += `Email: ${data.email}\n`;
         mensaje += `Ciudad: ${data.ciudad}, ${data.pais}\n`;
         mensaje += `\n`;
-        mensaje += `*Inversión:* RD$1,500\n`;
+        mensaje += `*Inversión:* RD$${inversion.toLocaleString('en-US')}\n`;
         mensaje += `\n`;
         mensaje += `Ya subí mi comprobante de transferencia en el formulario. Por favor validar mi inscripción. ¡Gracias!`;
 
