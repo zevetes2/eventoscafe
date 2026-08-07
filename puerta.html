@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Puerta · Control de acceso · CAFE 2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .puerta-wrap {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 40px 20px 90px;
+        }
+        .puerta-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+        .puerta-sub {
+            color: #f87171;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .puerta-search {
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .puerta-search input {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            padding: 16px 18px;
+            font-size: 1.05rem;
+            color: #fff;
+            font-family: inherit;
+            outline: none;
+        }
+        .puerta-search input:focus {
+            border-color: #ea580c;
+            background: rgba(255,255,255,0.09);
+        }
+        .puerta-hint {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.8rem;
+            margin: 0 4px 22px;
+        }
+        .puerta-count {
+            color: rgba(255,255,255,0.55);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 14px;
+            min-height: 1.1em;
+        }
+        .persona-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 18px 18px 16px;
+            margin-bottom: 14px;
+        }
+        .persona-card.ya-asistio {
+            border-color: rgba(34,197,94,0.5);
+            background: rgba(34,197,94,0.08);
+        }
+        .persona-nombre {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .persona-cedula {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .persona-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0 14px;
+        }
+        .badge {
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 5px 11px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .badge-tipo { background: rgba(59,130,246,0.18); color: #93c5fd; }
+        .badge-taller { background: rgba(234,88,12,0.18); color: #fdba74; }
+        .badge-pago-ok { background: rgba(34,197,94,0.18); color: #86efac; }
+        .badge-pago-pend { background: rgba(234,179,8,0.18); color: #fde047; }
+        .badge-pago-desc { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+        .persona-lider {
+            color: rgba(255,255,255,0.55);
+            font-size: 0.82rem;
+            margin: -4px 0 12px;
+        }
+        .persona-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .asistio-tag {
+            color: #86efac;
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+        .btn-asistio {
+            background: #16a34a;
+            color: #fff;
+            border: none;
+            border-radius: 11px;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.15s ease, opacity 0.15s ease;
+        }
+        .btn-asistio:hover { background: #22c55e; }
+        .btn-asistio:disabled { opacity: 0.6; cursor: default; }
+        .btn-quitar {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.6);
+            border-radius: 11px;
+            padding: 11px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-quitar:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+        .puerta-empty {
+            text-align: center;
+            color: rgba(255,255,255,0.45);
+            padding: 40px 10px;
+            font-size: 0.95rem;
+        }
+        .puerta-error {
+            color: #f87171;
+            font-size: 0.9rem;
+            margin-top: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="puerta-wrap">
+        <h1 class="puerta-title">Control de puerta · CAFE 2026</h1>
+        <p class="puerta-sub">🔒 Vista interna — no compartas este enlace</p>
+
+        <div class="puerta-search">
+            <input type="text" id="q" autocomplete="off" autocapitalize="off"
+                   placeholder="Buscar por nombre o cédula…" aria-label="Buscar persona">
+        </div>
+        <p class="puerta-hint">Escribe al menos 2 letras. Busca en registros individuales y en asistentes de grupos.</p>
+
+        <p class="puerta-count" id="count"></p>
+        <div id="resultados"></div>
+        <p class="puerta-empty" id="empty">Empieza a escribir para buscar a la persona.</p>
+        <p class="puerta-error hidden" id="error">No se pudo consultar. Revisa tu conexión e intenta de nuevo.</p>
+    </div>
+
+    <script>
+        var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby_yEd54Yd2NXB4uH-A5JOifLOyWJ-V5utsr8Cs_vPk655fPvSYQhfIeeLMYRCfgrY0mQ/exec';
+
+        var qInput = document.getElementById('q');
+        var cont = document.getElementById('resultados');
+        var countEl = document.getElementById('count');
+        var emptyEl = document.getElementById('empty');
+        var errorEl = document.getElementById('error');
+
+        // Llama al backend por JSONP (evita problemas de CORS, igual que panel.html)
+        function jsonp(params, onOk, onErr) {
+            var cb = 'puertaCb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+            var s = document.createElement('script');
+            var fallo = setTimeout(function () { limpiar(); if (onErr) onErr(); }, 12000);
+            function limpiar() {
+                clearTimeout(fallo);
+                try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+                if (s.parentNode) s.parentNode.removeChild(s);
+            }
+            window[cb] = function (data) { limpiar(); if (onOk) onOk(data); };
+            s.onerror = function () { limpiar(); if (onErr) onErr(); };
+            var qs = ['callback=' + cb, '_=' + Date.now()];
+            for (var k in params) qs.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+            s.src = WEB_APP_URL + '?' + qs.join('&');
+            document.body.appendChild(s);
+        }
+
+        function esc(t) {
+            return String(t == null ? '' : t)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function badgePago(pago) {
+            var p = String(pago || '').toLowerCase();
+            if (!p) return '<span class="badge badge-pago-desc">Pago: —</span>';
+            if (p.indexOf('pend') !== -1) return '<span class="badge badge-pago-pend">⚠️ Pago pendiente</span>';
+            return '<span class="badge badge-pago-ok">✅ Pagado</span>';
+        }
+
+        function render(persona, idx) {
+            var yaAsistio = !!persona.asistio;
+            var card = document.createElement('div');
+            card.className = 'persona-card' + (yaAsistio ? ' ya-asistio' : '');
+
+            var lider = persona.lider
+                ? '<p class="persona-lider">👥 Grupo de: ' + esc(persona.lider) + '</p>' : '';
+
+            var foot = yaAsistio
+                ? '<span class="asistio-tag">✅ Asistió · ' + esc(persona.asistio) + '</span>' +
+                  '<button type="button" class="btn-quitar">Quitar</button>'
+                : '<span></span><button type="button" class="btn-asistio">Marcó asistencia</button>';
+
+            card.innerHTML =
+                '<div class="persona-nombre">' + esc(persona.nombre) + '</div>' +
+                '<div class="persona-cedula">Cédula: ' + (esc(persona.cedula) || '—') + '</div>' +
+                '<div class="persona-badges">' +
+                    '<span class="badge badge-tipo">' + esc(persona.tipo) + '</span>' +
+                    (persona.taller ? '<span class="badge badge-taller">' + esc(persona.taller) + '</span>' : '') +
+                    badgePago(persona.pago) +
+                '</div>' + lider +
+                '<div class="persona-foot">' + foot + '</div>';
+
+            var btn = card.querySelector('.btn-asistio') || card.querySelector('.btn-quitar');
+            if (btn) {
+                btn.addEventListener('click', function () {
+                    var quitar = btn.classList.contains('btn-quitar');
+                    btn.disabled = true;
+                    btn.textContent = quitar ? 'Quitando…' : 'Guardando…';
+                    jsonp(
+                        { action: 'asistencia', hoja: persona.hoja, fila: persona.fila, quitar: quitar ? '1' : '0' },
+                        function (res) {
+                            if (res && res.success) {
+                                persona.asistio = res.asistio || '';
+                                render(persona, idx); // vuelve a pintar la tarjeta con el nuevo estado
+                            } else {
+                                btn.disabled = false;
+                                btn.textContent = quitar ? 'Quitar' : 'Marcó asistencia';
+                            }
+                        },
+                        function () {
+                            btn.disabled = false;
+                            btn.textContent = quitar ? 'Quitar' : 'Marcó asistencia';
+                        }
+                    );
+                });
+            }
+
+            if (typeof idx === 'number' && cont.children[idx]) {
+                cont.replaceChild(card, cont.children[idx]);
+            } else {
+                cont.appendChild(card);
+            }
+        }
+
+        function mostrar(resultados) {
+            cont.innerHTML = '';
+            errorEl.classList.add('hidden');
+            if (!resultados.length) {
+                countEl.textContent = '';
+                emptyEl.textContent = 'Sin coincidencias. Revisa la escritura o prueba con la cédula.';
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+            emptyEl.classList.add('hidden');
+            countEl.textContent = resultados.length + (resultados.length === 1 ? ' persona' : ' personas');
+            resultados.forEach(function (p) { render(p); });
+        }
+
+        var timer = null, ultimaBusqueda = '';
+        function buscar() {
+            var q = qInput.value.trim();
+            ultimaBusqueda = q;
+            if (q.length < 2) {
+                cont.innerHTML = '';
+                countEl.textContent = '';
+                emptyEl.textContent = 'Empieza a escribir para buscar a la persona.';
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+            countEl.textContent = 'Buscando…';
+            jsonp({ action: 'buscar', q: q },
+                function (res) {
+                    if (q !== ultimaBusqueda) return; // ignora respuestas viejas
+                    mostrar((res && res.resultados) ? res.resultados : []);
+                },
+                function () {
+                    if (q !== ultimaBusqueda) return;
+                    countEl.textContent = '';
+                    errorEl.classList.remove('hidden');
+                }
+            );
+        }
+
+        qInput.addEventListener('input', function () {
+            clearTimeout(timer);
+            timer = setTimeout(buscar, 300);
+        });
+        qInput.focus();
+    </script>
+</body>
+</html>

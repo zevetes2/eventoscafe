@@ -93,10 +93,155 @@ function doGet(e) {
       ? ContentService.createTextOutput(cb + '(' + JSON.stringify(stats) + ')').setMimeType(ContentService.MimeType.JAVASCRIPT)
       : jsonResponse(stats);
   }
+  // Vista de puerta: buscar a una persona en la lista
+  if (e && e.parameter && e.parameter.action === 'buscar') {
+    return jsonpOrJson(e.parameter.callback, buscarPersonas(e.parameter.q || ''));
+  }
+  // Vista de puerta: marcar (o quitar) asistencia de una fila concreta
+  if (e && e.parameter && e.parameter.action === 'asistencia') {
+    return jsonpOrJson(
+      e.parameter.callback,
+      marcarAsistencia(e.parameter.hoja, e.parameter.fila, e.parameter.quitar === '1')
+    );
+  }
   if (e && e.parameter && e.parameter.tipo) {
     return handleJsonp(e);
   }
   return jsonResponse({ success: true, message: 'CAFE 2026 backend activo' });
+}
+
+// ============================================================
+// VISTA DE PUERTA — buscar + marcar asistencia
+// ============================================================
+
+// Normaliza texto para comparar sin distinguir mayúsculas ni acentos.
+function normaliza(s) {
+  return String(s == null ? '' : s)
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Devuelve el índice (1-based) de la columna "Asistió"; la crea si no existe.
+function columnaAsistio(sheet) {
+  var lastCol = sheet.getLastColumn();
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  for (var i = 0; i < headers.length; i++) {
+    if (String(headers[i]).trim() === 'Asistió') return i + 1;
+  }
+  var col = lastCol + 1;
+  sheet.getRange(1, col).setValue('Asistió')
+    .setFontWeight('bold').setBackground('#ea580c').setFontColor('#ffffff');
+  return col;
+}
+
+function formateaAsistio(v) {
+  if (!v) return '';
+  if (v instanceof Date) return Utilities.formatDate(v, 'GMT-4', 'HH:mm');
+  return String(v);
+}
+
+// Busca coincidencias por nombre o cédula en individuales y asistentes grupales.
+function buscarPersonas(query) {
+  var q = normaliza(query);
+  if (q.length < 2) return { success: true, resultados: [] };
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var resultados = [];
+
+  // Estado de pago por cédula de líder (los asistentes grupales pagan por grupo).
+  var pagoLider = {};
+  var shGrupal = ss.getSheetByName(CONFIG.HOJA_GRUPAL);
+  if (shGrupal && shGrupal.getLastRow() > 1) {
+    var gv = shGrupal.getDataRange().getValues();
+    for (var g = 1; g < gv.length; g++) {
+      pagoLider[normaliza(gv[g][1])] = gv[g][16]; // Cédula Líder -> Estado Pago
+    }
+  }
+
+  // Registros individuales
+  var shInd = ss.getSheetByName(CONFIG.HOJA_INDIVIDUAL);
+  if (shInd && shInd.getLastRow() > 1) {
+    var colInd = columnaAsistio(shInd);
+    var iv = shInd.getDataRange().getValues();
+    for (var r = 1; r < iv.length; r++) {
+      var nombreI = String(iv[r][1] + ' ' + iv[r][2]).trim();
+      var cedulaI = String(iv[r][3]);
+      if (normaliza(nombreI).indexOf(q) !== -1 || normaliza(cedulaI).indexOf(q) !== -1) {
+        resultados.push({
+          hoja: CONFIG.HOJA_INDIVIDUAL,
+          fila: r + 1,
+          nombre: nombreI,
+          cedula: cedulaI,
+          taller: String(iv[r][9]),
+          tipo: 'Individual',
+          lider: '',
+          pago: String(iv[r][14]),
+          asistio: formateaAsistio(iv[r][colInd - 1])
+        });
+      }
+    }
+  }
+
+  // Asistentes de registros grupales
+  var shAsis = ss.getSheetByName(CONFIG.HOJA_ASISTENTES);
+  if (shAsis && shAsis.getLastRow() > 1) {
+    var colAsis = columnaAsistio(shAsis);
+    var av = shAsis.getDataRange().getValues();
+    for (var a = 1; a < av.length; a++) {
+      var nombreA = String(av[a][3]);
+      var cedulaA = String(av[a][4]);
+      if (normaliza(nombreA).indexOf(q) !== -1 || normaliza(cedulaA).indexOf(q) !== -1) {
+        resultados.push({
+          hoja: CONFIG.HOJA_ASISTENTES,
+          fila: a + 1,
+          nombre: nombreA,
+          cedula: cedulaA,
+          taller: String(av[a][5]),
+          tipo: 'Grupal',
+          lider: String(av[a][2]),
+          pago: String(pagoLider[normaliza(av[a][1])] || ''),
+          asistio: formateaAsistio(av[a][colAsis - 1])
+        });
+      }
+    }
+  }
+
+  return { success: true, resultados: resultados.slice(0, 40) };
+}
+
+// Marca (o quita) la asistencia de una fila concreta escribiendo la hora.
+function marcarAsistencia(hoja, fila, quitar) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(15000);
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(hoja);
+    if (!sheet) throw new Error('Hoja no encontrada: ' + hoja);
+    var f = parseInt(fila, 10);
+    if (!f || f < 2 || f > sheet.getLastRow()) throw new Error('Fila inválida: ' + fila);
+
+    var col = columnaAsistio(sheet);
+    if (quitar) {
+      sheet.getRange(f, col).clearContent();
+      return { success: true, asistio: '' };
+    }
+    var ahora = new Date();
+    sheet.getRange(f, col).setValue(ahora);
+    return { success: true, asistio: Utilities.formatDate(ahora, 'GMT-4', 'HH:mm') };
+  } catch (err) {
+    return { success: false, message: String(err) };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function jsonpOrJson(callback, obj) {
+  return callback
+    ? ContentService.createTextOutput(callback + '(' + JSON.stringify(obj) + ')')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT)
+    : jsonResponse(obj);
 }
 
 // ============================================================
